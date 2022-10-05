@@ -13,6 +13,7 @@ const geometry = new BoxGeometry(0.5, 0.5, 0.5);
 
 const orangeMaterial = new MeshBasicMaterial({color: 'orange'});
 const blueMaterial = new MeshBasicMaterial({color: 'blue'});
+const greenMaterial = new MeshBasicMaterial({color: 'green'});
 
 const orangeCube = new Mesh(geometry, orangeMaterial);
 scene.add(orangeCube);
@@ -21,6 +22,10 @@ const bigBlueCube = new Mesh(geometry, blueMaterial);
 bigBlueCube.position.x += 2;
 bigBlueCube.scale.set(2,2,2);
 scene.add(bigBlueCube);
+
+const greenCube = new Mesh(geometry, greenMaterial);
+greenCube.position.x -= 2;
+scene.add(greenCube);
 
 const sizes = {
     width: 800,
@@ -45,6 +50,9 @@ function animate(){
 
     bigBlueCube.rotation.x -= 0.02;
     bigBlueCube.rotation.z -= 0.02;
+
+    greenCube.rotation.x += 0.005;
+    greenCube.rotation.z += 0.005;
 
     render.render(scene, camera);
     requestAnimationFrame(animate);
