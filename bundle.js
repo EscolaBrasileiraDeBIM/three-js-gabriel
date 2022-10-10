@@ -28614,6 +28614,842 @@ class Scene extends Object3D {
 
 }
 
+class MeshPhongMaterial extends Material {
+
+	constructor( parameters ) {
+
+		super();
+
+		this.isMeshPhongMaterial = true;
+
+		this.type = 'MeshPhongMaterial';
+
+		this.color = new Color( 0xffffff ); // diffuse
+		this.specular = new Color( 0x111111 );
+		this.shininess = 30;
+
+		this.map = null;
+
+		this.lightMap = null;
+		this.lightMapIntensity = 1.0;
+
+		this.aoMap = null;
+		this.aoMapIntensity = 1.0;
+
+		this.emissive = new Color( 0x000000 );
+		this.emissiveIntensity = 1.0;
+		this.emissiveMap = null;
+
+		this.bumpMap = null;
+		this.bumpScale = 1;
+
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
+
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
+
+		this.specularMap = null;
+
+		this.alphaMap = null;
+
+		this.envMap = null;
+		this.combine = MultiplyOperation;
+		this.reflectivity = 1;
+		this.refractionRatio = 0.98;
+
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
+		this.wireframeLinecap = 'round';
+		this.wireframeLinejoin = 'round';
+
+		this.flatShading = false;
+
+		this.fog = true;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.color.copy( source.color );
+		this.specular.copy( source.specular );
+		this.shininess = source.shininess;
+
+		this.map = source.map;
+
+		this.lightMap = source.lightMap;
+		this.lightMapIntensity = source.lightMapIntensity;
+
+		this.aoMap = source.aoMap;
+		this.aoMapIntensity = source.aoMapIntensity;
+
+		this.emissive.copy( source.emissive );
+		this.emissiveMap = source.emissiveMap;
+		this.emissiveIntensity = source.emissiveIntensity;
+
+		this.bumpMap = source.bumpMap;
+		this.bumpScale = source.bumpScale;
+
+		this.normalMap = source.normalMap;
+		this.normalMapType = source.normalMapType;
+		this.normalScale.copy( source.normalScale );
+
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+
+		this.specularMap = source.specularMap;
+
+		this.alphaMap = source.alphaMap;
+
+		this.envMap = source.envMap;
+		this.combine = source.combine;
+		this.reflectivity = source.reflectivity;
+		this.refractionRatio = source.refractionRatio;
+
+		this.wireframe = source.wireframe;
+		this.wireframeLinewidth = source.wireframeLinewidth;
+		this.wireframeLinecap = source.wireframeLinecap;
+		this.wireframeLinejoin = source.wireframeLinejoin;
+
+		this.flatShading = source.flatShading;
+
+		this.fog = source.fog;
+
+		return this;
+
+	}
+
+}
+
+class MeshLambertMaterial extends Material {
+
+	constructor( parameters ) {
+
+		super();
+
+		this.isMeshLambertMaterial = true;
+
+		this.type = 'MeshLambertMaterial';
+
+		this.color = new Color( 0xffffff ); // diffuse
+
+		this.map = null;
+
+		this.lightMap = null;
+		this.lightMapIntensity = 1.0;
+
+		this.aoMap = null;
+		this.aoMapIntensity = 1.0;
+
+		this.emissive = new Color( 0x000000 );
+		this.emissiveIntensity = 1.0;
+		this.emissiveMap = null;
+
+		this.bumpMap = null;
+		this.bumpScale = 1;
+
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
+
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
+
+		this.specularMap = null;
+
+		this.alphaMap = null;
+
+		this.envMap = null;
+		this.combine = MultiplyOperation;
+		this.reflectivity = 1;
+		this.refractionRatio = 0.98;
+
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
+		this.wireframeLinecap = 'round';
+		this.wireframeLinejoin = 'round';
+
+		this.flatShading = false;
+
+		this.fog = true;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.color.copy( source.color );
+
+		this.map = source.map;
+
+		this.lightMap = source.lightMap;
+		this.lightMapIntensity = source.lightMapIntensity;
+
+		this.aoMap = source.aoMap;
+		this.aoMapIntensity = source.aoMapIntensity;
+
+		this.emissive.copy( source.emissive );
+		this.emissiveMap = source.emissiveMap;
+		this.emissiveIntensity = source.emissiveIntensity;
+
+		this.bumpMap = source.bumpMap;
+		this.bumpScale = source.bumpScale;
+
+		this.normalMap = source.normalMap;
+		this.normalMapType = source.normalMapType;
+		this.normalScale.copy( source.normalScale );
+
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+
+		this.specularMap = source.specularMap;
+
+		this.alphaMap = source.alphaMap;
+
+		this.envMap = source.envMap;
+		this.combine = source.combine;
+		this.reflectivity = source.reflectivity;
+		this.refractionRatio = source.refractionRatio;
+
+		this.wireframe = source.wireframe;
+		this.wireframeLinewidth = source.wireframeLinewidth;
+		this.wireframeLinecap = source.wireframeLinecap;
+		this.wireframeLinejoin = source.wireframeLinejoin;
+
+		this.flatShading = source.flatShading;
+
+		this.fog = source.fog;
+
+		return this;
+
+	}
+
+}
+
+const Cache = {
+
+	enabled: false,
+
+	files: {},
+
+	add: function ( key, file ) {
+
+		if ( this.enabled === false ) return;
+
+		// console.log( 'THREE.Cache', 'Adding key:', key );
+
+		this.files[ key ] = file;
+
+	},
+
+	get: function ( key ) {
+
+		if ( this.enabled === false ) return;
+
+		// console.log( 'THREE.Cache', 'Checking key:', key );
+
+		return this.files[ key ];
+
+	},
+
+	remove: function ( key ) {
+
+		delete this.files[ key ];
+
+	},
+
+	clear: function () {
+
+		this.files = {};
+
+	}
+
+};
+
+class LoadingManager {
+
+	constructor( onLoad, onProgress, onError ) {
+
+		const scope = this;
+
+		let isLoading = false;
+		let itemsLoaded = 0;
+		let itemsTotal = 0;
+		let urlModifier = undefined;
+		const handlers = [];
+
+		// Refer to #5689 for the reason why we don't set .onStart
+		// in the constructor
+
+		this.onStart = undefined;
+		this.onLoad = onLoad;
+		this.onProgress = onProgress;
+		this.onError = onError;
+
+		this.itemStart = function ( url ) {
+
+			itemsTotal ++;
+
+			if ( isLoading === false ) {
+
+				if ( scope.onStart !== undefined ) {
+
+					scope.onStart( url, itemsLoaded, itemsTotal );
+
+				}
+
+			}
+
+			isLoading = true;
+
+		};
+
+		this.itemEnd = function ( url ) {
+
+			itemsLoaded ++;
+
+			if ( scope.onProgress !== undefined ) {
+
+				scope.onProgress( url, itemsLoaded, itemsTotal );
+
+			}
+
+			if ( itemsLoaded === itemsTotal ) {
+
+				isLoading = false;
+
+				if ( scope.onLoad !== undefined ) {
+
+					scope.onLoad();
+
+				}
+
+			}
+
+		};
+
+		this.itemError = function ( url ) {
+
+			if ( scope.onError !== undefined ) {
+
+				scope.onError( url );
+
+			}
+
+		};
+
+		this.resolveURL = function ( url ) {
+
+			if ( urlModifier ) {
+
+				return urlModifier( url );
+
+			}
+
+			return url;
+
+		};
+
+		this.setURLModifier = function ( transform ) {
+
+			urlModifier = transform;
+
+			return this;
+
+		};
+
+		this.addHandler = function ( regex, loader ) {
+
+			handlers.push( regex, loader );
+
+			return this;
+
+		};
+
+		this.removeHandler = function ( regex ) {
+
+			const index = handlers.indexOf( regex );
+
+			if ( index !== - 1 ) {
+
+				handlers.splice( index, 2 );
+
+			}
+
+			return this;
+
+		};
+
+		this.getHandler = function ( file ) {
+
+			for ( let i = 0, l = handlers.length; i < l; i += 2 ) {
+
+				const regex = handlers[ i ];
+				const loader = handlers[ i + 1 ];
+
+				if ( regex.global ) regex.lastIndex = 0; // see #17920
+
+				if ( regex.test( file ) ) {
+
+					return loader;
+
+				}
+
+			}
+
+			return null;
+
+		};
+
+	}
+
+}
+
+const DefaultLoadingManager = /*@__PURE__*/ new LoadingManager();
+
+class Loader {
+
+	constructor( manager ) {
+
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+
+		this.crossOrigin = 'anonymous';
+		this.withCredentials = false;
+		this.path = '';
+		this.resourcePath = '';
+		this.requestHeader = {};
+
+	}
+
+	load( /* url, onLoad, onProgress, onError */ ) {}
+
+	loadAsync( url, onProgress ) {
+
+		const scope = this;
+
+		return new Promise( function ( resolve, reject ) {
+
+			scope.load( url, resolve, onProgress, reject );
+
+		} );
+
+	}
+
+	parse( /* data */ ) {}
+
+	setCrossOrigin( crossOrigin ) {
+
+		this.crossOrigin = crossOrigin;
+		return this;
+
+	}
+
+	setWithCredentials( value ) {
+
+		this.withCredentials = value;
+		return this;
+
+	}
+
+	setPath( path ) {
+
+		this.path = path;
+		return this;
+
+	}
+
+	setResourcePath( resourcePath ) {
+
+		this.resourcePath = resourcePath;
+		return this;
+
+	}
+
+	setRequestHeader( requestHeader ) {
+
+		this.requestHeader = requestHeader;
+		return this;
+
+	}
+
+}
+
+class ImageLoader extends Loader {
+
+	constructor( manager ) {
+
+		super( manager );
+
+	}
+
+	load( url, onLoad, onProgress, onError ) {
+
+		if ( this.path !== undefined ) url = this.path + url;
+
+		url = this.manager.resolveURL( url );
+
+		const scope = this;
+
+		const cached = Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			scope.manager.itemStart( url );
+
+			setTimeout( function () {
+
+				if ( onLoad ) onLoad( cached );
+
+				scope.manager.itemEnd( url );
+
+			}, 0 );
+
+			return cached;
+
+		}
+
+		const image = createElementNS( 'img' );
+
+		function onImageLoad() {
+
+			removeEventListeners();
+
+			Cache.add( url, this );
+
+			if ( onLoad ) onLoad( this );
+
+			scope.manager.itemEnd( url );
+
+		}
+
+		function onImageError( event ) {
+
+			removeEventListeners();
+
+			if ( onError ) onError( event );
+
+			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
+
+		}
+
+		function removeEventListeners() {
+
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
+
+		}
+
+		image.addEventListener( 'load', onImageLoad, false );
+		image.addEventListener( 'error', onImageError, false );
+
+		if ( url.slice( 0, 5 ) !== 'data:' ) {
+
+			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
+		}
+
+		scope.manager.itemStart( url );
+
+		image.src = url;
+
+		return image;
+
+	}
+
+}
+
+class TextureLoader extends Loader {
+
+	constructor( manager ) {
+
+		super( manager );
+
+	}
+
+	load( url, onLoad, onProgress, onError ) {
+
+		const texture = new Texture();
+
+		const loader = new ImageLoader( this.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
+
+		loader.load( url, function ( image ) {
+
+			texture.image = image;
+			texture.needsUpdate = true;
+
+			if ( onLoad !== undefined ) {
+
+				onLoad( texture );
+
+			}
+
+		}, onProgress, onError );
+
+		return texture;
+
+	}
+
+}
+
+class Light extends Object3D {
+
+	constructor( color, intensity = 1 ) {
+
+		super();
+
+		this.isLight = true;
+
+		this.type = 'Light';
+
+		this.color = new Color( color );
+		this.intensity = intensity;
+
+	}
+
+	dispose() {
+
+		// Empty here in base class; some subclasses override.
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.color.copy( source.color );
+		this.intensity = source.intensity;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.color = this.color.getHex();
+		data.object.intensity = this.intensity;
+
+		if ( this.groundColor !== undefined ) data.object.groundColor = this.groundColor.getHex();
+
+		if ( this.distance !== undefined ) data.object.distance = this.distance;
+		if ( this.angle !== undefined ) data.object.angle = this.angle;
+		if ( this.decay !== undefined ) data.object.decay = this.decay;
+		if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
+
+		if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
+
+		return data;
+
+	}
+
+}
+
+const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
+const _lightPositionWorld$1 = /*@__PURE__*/ new Vector3();
+const _lookTarget$1 = /*@__PURE__*/ new Vector3();
+
+class LightShadow {
+
+	constructor( camera ) {
+
+		this.camera = camera;
+
+		this.bias = 0;
+		this.normalBias = 0;
+		this.radius = 1;
+		this.blurSamples = 8;
+
+		this.mapSize = new Vector2( 512, 512 );
+
+		this.map = null;
+		this.mapPass = null;
+		this.matrix = new Matrix4();
+
+		this.autoUpdate = true;
+		this.needsUpdate = false;
+
+		this._frustum = new Frustum();
+		this._frameExtents = new Vector2( 1, 1 );
+
+		this._viewportCount = 1;
+
+		this._viewports = [
+
+			new Vector4( 0, 0, 1, 1 )
+
+		];
+
+	}
+
+	getViewportCount() {
+
+		return this._viewportCount;
+
+	}
+
+	getFrustum() {
+
+		return this._frustum;
+
+	}
+
+	updateMatrices( light ) {
+
+		const shadowCamera = this.camera;
+		const shadowMatrix = this.matrix;
+
+		_lightPositionWorld$1.setFromMatrixPosition( light.matrixWorld );
+		shadowCamera.position.copy( _lightPositionWorld$1 );
+
+		_lookTarget$1.setFromMatrixPosition( light.target.matrixWorld );
+		shadowCamera.lookAt( _lookTarget$1 );
+		shadowCamera.updateMatrixWorld();
+
+		_projScreenMatrix$1.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1 );
+
+		shadowMatrix.set(
+			0.5, 0.0, 0.0, 0.5,
+			0.0, 0.5, 0.0, 0.5,
+			0.0, 0.0, 0.5, 0.5,
+			0.0, 0.0, 0.0, 1.0
+		);
+
+		shadowMatrix.multiply( _projScreenMatrix$1 );
+
+	}
+
+	getViewport( viewportIndex ) {
+
+		return this._viewports[ viewportIndex ];
+
+	}
+
+	getFrameExtents() {
+
+		return this._frameExtents;
+
+	}
+
+	dispose() {
+
+		if ( this.map ) {
+
+			this.map.dispose();
+
+		}
+
+		if ( this.mapPass ) {
+
+			this.mapPass.dispose();
+
+		}
+
+	}
+
+	copy( source ) {
+
+		this.camera = source.camera.clone();
+
+		this.bias = source.bias;
+		this.radius = source.radius;
+
+		this.mapSize.copy( source.mapSize );
+
+		return this;
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+	toJSON() {
+
+		const object = {};
+
+		if ( this.bias !== 0 ) object.bias = this.bias;
+		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
+		if ( this.radius !== 1 ) object.radius = this.radius;
+		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
+
+		object.camera = this.camera.toJSON( false ).object;
+		delete object.camera.matrix;
+
+		return object;
+
+	}
+
+}
+
+class DirectionalLightShadow extends LightShadow {
+
+	constructor() {
+
+		super( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
+
+		this.isDirectionalLightShadow = true;
+
+	}
+
+}
+
+class DirectionalLight extends Light {
+
+	constructor( color, intensity ) {
+
+		super( color, intensity );
+
+		this.isDirectionalLight = true;
+
+		this.type = 'DirectionalLight';
+
+		this.position.copy( Object3D.DefaultUp );
+		this.updateMatrix();
+
+		this.target = new Object3D();
+
+		this.shadow = new DirectionalLightShadow();
+
+	}
+
+	dispose() {
+
+		this.shadow.dispose();
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.target = source.target.clone();
+		this.shadow = source.shadow.clone();
+
+		return this;
+
+	}
+
+}
+
 class Clock {
 
 	constructor( autoStart = true ) {
@@ -30997,9 +31833,22 @@ const canvas = document.getElementById("three-canvas");
     //2 The Object
     const geometry = new BoxGeometry(0.5, 0.5, 0.5);
 
-    const orangeMaterial = new MeshBasicMaterial({color: 'orange'});
-    const blueMaterial = new MeshBasicMaterial({color: 'blue'});
-    const greenMaterial = new MeshBasicMaterial({color: 'green'});
+    const loader = new TextureLoader();
+
+    const orangeMaterial = new MeshBasicMaterial({
+        color: 'orange',
+        map: loader.load("https://raw.githubusercontent.com/IFCjs/ifcjs-crash-course/main/static/logo.png")
+    });
+    const blueMaterial = new MeshLambertMaterial({
+        color: 'blue',
+        map: loader.load('./sample.jpg')
+    });
+    const greenMaterial = new MeshPhongMaterial({
+        color: 'green',
+        specular: 'white',
+        shininess: 100,
+        flatShading: true,
+    });
 
     const orangeCube = new Mesh(geometry, orangeMaterial);
     scene.add(orangeCube);
@@ -31020,8 +31869,16 @@ const canvas = document.getElementById("three-canvas");
     
     //4 The Renderer
     const renderer = new WebGLRenderer({canvas});
-
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+    const light1 = new DirectionalLight();
+    light1.position.set(3,2,1).normalize();
+    scene.add(light1);
+
+    const light2 = new DirectionalLight();
+    light2.position.set(-3,2,-1).normalize();
+    scene.add(light2);
+
 
     window.addEventListener("resize", () => {
         camera.aspect = canvas.clientWidth / canvas.clientHeight;

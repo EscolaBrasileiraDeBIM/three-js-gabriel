@@ -16,7 +16,11 @@ import {
     Sphere,
     Raycaster,
     MathUtils,
-    Clock
+    Clock,
+    MeshLambertMaterial,
+    DirectionalLight,
+    TextureLoader,
+    MeshPhongMaterial
 } from 'three';
 import CameraControls from 'camera-controls';
     
@@ -29,9 +33,22 @@ import CameraControls from 'camera-controls';
     //2 The Object
     const geometry = new BoxGeometry(0.5, 0.5, 0.5);
 
-    const orangeMaterial = new MeshBasicMaterial({color: 'orange'});
-    const blueMaterial = new MeshBasicMaterial({color: 'blue'});
-    const greenMaterial = new MeshBasicMaterial({color: 'green'});
+    const loader = new TextureLoader();
+
+    const orangeMaterial = new MeshBasicMaterial({
+        color: 'orange',
+        map: loader.load("https://raw.githubusercontent.com/IFCjs/ifcjs-crash-course/main/static/logo.png")
+    });
+    const blueMaterial = new MeshLambertMaterial({
+        color: 'blue',
+        map: loader.load('./sample.jpg')
+    });
+    const greenMaterial = new MeshPhongMaterial({
+        color: 'green',
+        specular: 'white',
+        shininess: 100,
+        flatShading: true,
+    });
 
     const orangeCube = new Mesh(geometry, orangeMaterial);
     scene.add(orangeCube);
@@ -52,8 +69,16 @@ import CameraControls from 'camera-controls';
     
     //4 The Renderer
     const renderer = new WebGLRenderer({canvas});
-
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+    const light1 = new DirectionalLight();
+    light1.position.set(3,2,1).normalize();
+    scene.add(light1);
+
+    const light2 = new DirectionalLight();
+    light2.position.set(-3,2,-1).normalize();
+    scene.add(light2);
+
 
     window.addEventListener("resize", () => {
         camera.aspect = canvas.clientWidth / canvas.clientHeight;
