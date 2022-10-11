@@ -20,7 +20,11 @@ import {
     MeshLambertMaterial,
     DirectionalLight,
     TextureLoader,
-    MeshPhongMaterial
+    MeshPhongMaterial,
+    AmbientLight,
+    SphereGeometry,
+    AxesHelper,
+    GridHelper
 } from 'three';
 import CameraControls from 'camera-controls';
     
@@ -30,8 +34,27 @@ import CameraControls from 'camera-controls';
     //1 The scene
     const scene = new Scene();
 
+    // const sphereGeometry = new SphereGeometry(0.5);
+
+    // const sunMaterial = new MeshLambertMaterial({color: 'orange'});
+    // const earthMaterial = new MeshLambertMaterial({color: 'blue'});    
+    // const moonMaterial = new MeshLambertMaterial({color: 'white'});
+
+    // const sun = new Mesh(sphereGeometry, sunMaterial);
+    // scene.add(sun);
+
+    // const earth = new Mesh(sphereGeometry, earthMaterial);
+    // earth.scale.set(0.2,0.2,0.2);
+    // earth.position.x += 5;
+    // sun.add(earth);
+
+    // const moon = new Mesh(sphereGeometry, moonMaterial);
+    // moon.scale.set(0.1,0.1,0.1);
+    // moon.position.x += 1;
+    // earth.add(moon);
+
     //2 The Object
-    const geometry = new BoxGeometry(0.5, 0.5, 0.5);
+    const boxGeometry = new BoxGeometry(0.5, 0.5, 0.5);
 
     const loader = new TextureLoader();
 
@@ -50,34 +73,46 @@ import CameraControls from 'camera-controls';
         flatShading: true,
     });
 
-    const orangeCube = new Mesh(geometry, orangeMaterial);
+    const orangeCube = new Mesh(boxGeometry, orangeMaterial);
     scene.add(orangeCube);
 
-    const bigBlueCube = new Mesh(geometry, blueMaterial);
+    const bigBlueCube = new Mesh(boxGeometry, blueMaterial);
     bigBlueCube.position.x += 2;
     bigBlueCube.scale.set(2,2,2);
     scene.add(bigBlueCube);
 
-    const greenCube = new Mesh(geometry, greenMaterial);
+    const greenCube = new Mesh(boxGeometry, greenMaterial);
     greenCube.position.x -= 2;
     scene.add(greenCube);
+
+    const axes = new AxesHelper();
+    axes.material.depthTest = false;
+    axes.renderOrder = 2;
+    scene.add(axes);
+
+    const grid = new GridHelper();
+    grid.material.depthTest = false;
+    grid.renderOrder = 2;
+    scene.add(grid);
     
     //3 The Camera
     const camera = new PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight);
-    camera.position.z = 3; // Z let's you move backwards and forwards. X is sideways, Y is upward and do
+    camera.position.x = 6;
+    camera.position.y = 4;
+    camera.position.z = 5; // Z let's you move backwards and forwards. X is sideways, Y is upward and do
+    camera.lookAt(axes.position);
     scene.add(camera);
     
     //4 The Renderer
     const renderer = new WebGLRenderer({canvas});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    renderer.setClearColor(0x3E3E3E, 1)
 
-    const light1 = new DirectionalLight();
-    light1.position.set(3,2,1).normalize();
-    scene.add(light1);
-
-    const light2 = new DirectionalLight();
-    light2.position.set(-3,2,-1).normalize();
-    scene.add(light2);
+    const light = new DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 0.5);
+    const baseLight = new AmbientLight(0xffffff, 1);
+    scene.add(light, baseLight);
 
 
     window.addEventListener("resize", () => {
@@ -85,6 +120,8 @@ import CameraControls from 'camera-controls';
         camera.updateProjectionMatrix();
         renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
     });
+
+    
 
     // const controls = new OrbitControls(camera, canvas);
     // controls.enableDamping = true;
@@ -119,6 +156,9 @@ import CameraControls from 'camera-controls';
 
         greenCube.rotation.x += 0.005;
         greenCube.rotation.z += 0.005;
+
+        // sun.rotation.y += 0.01;
+        // earth.rotation.y += 0.02;
 
         const delta = clock.getDelta();
 	    cameraControls.update( delta );
