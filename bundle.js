@@ -32306,15 +32306,15 @@ const canvas = document.getElementById("three-canvas");
     greenCube.position.x -= 2;
     scene.add(greenCube);
 
-    const axes = new AxesHelper();
-    axes.material.depthTest = false;
-    axes.renderOrder = 2;
-    scene.add(axes);
-
     const grid = new GridHelper();
     grid.material.depthTest = false;
     grid.renderOrder = 2;
     scene.add(grid);
+
+    const axes = new AxesHelper();
+    axes.material.depthTest = false;
+    axes.renderOrder = 3;
+    scene.add(axes);
     
     //3 The Camera
     const camera = new PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight);
