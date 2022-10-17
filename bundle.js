@@ -29031,484 +29031,6 @@ class MeshPhongMaterial extends Material {
 
 }
 
-class MeshLambertMaterial extends Material {
-
-	constructor( parameters ) {
-
-		super();
-
-		this.isMeshLambertMaterial = true;
-
-		this.type = 'MeshLambertMaterial';
-
-		this.color = new Color( 0xffffff ); // diffuse
-
-		this.map = null;
-
-		this.lightMap = null;
-		this.lightMapIntensity = 1.0;
-
-		this.aoMap = null;
-		this.aoMapIntensity = 1.0;
-
-		this.emissive = new Color( 0x000000 );
-		this.emissiveIntensity = 1.0;
-		this.emissiveMap = null;
-
-		this.bumpMap = null;
-		this.bumpScale = 1;
-
-		this.normalMap = null;
-		this.normalMapType = TangentSpaceNormalMap;
-		this.normalScale = new Vector2( 1, 1 );
-
-		this.displacementMap = null;
-		this.displacementScale = 1;
-		this.displacementBias = 0;
-
-		this.specularMap = null;
-
-		this.alphaMap = null;
-
-		this.envMap = null;
-		this.combine = MultiplyOperation;
-		this.reflectivity = 1;
-		this.refractionRatio = 0.98;
-
-		this.wireframe = false;
-		this.wireframeLinewidth = 1;
-		this.wireframeLinecap = 'round';
-		this.wireframeLinejoin = 'round';
-
-		this.flatShading = false;
-
-		this.fog = true;
-
-		this.setValues( parameters );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.color.copy( source.color );
-
-		this.map = source.map;
-
-		this.lightMap = source.lightMap;
-		this.lightMapIntensity = source.lightMapIntensity;
-
-		this.aoMap = source.aoMap;
-		this.aoMapIntensity = source.aoMapIntensity;
-
-		this.emissive.copy( source.emissive );
-		this.emissiveMap = source.emissiveMap;
-		this.emissiveIntensity = source.emissiveIntensity;
-
-		this.bumpMap = source.bumpMap;
-		this.bumpScale = source.bumpScale;
-
-		this.normalMap = source.normalMap;
-		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
-
-		this.displacementMap = source.displacementMap;
-		this.displacementScale = source.displacementScale;
-		this.displacementBias = source.displacementBias;
-
-		this.specularMap = source.specularMap;
-
-		this.alphaMap = source.alphaMap;
-
-		this.envMap = source.envMap;
-		this.combine = source.combine;
-		this.reflectivity = source.reflectivity;
-		this.refractionRatio = source.refractionRatio;
-
-		this.wireframe = source.wireframe;
-		this.wireframeLinewidth = source.wireframeLinewidth;
-		this.wireframeLinecap = source.wireframeLinecap;
-		this.wireframeLinejoin = source.wireframeLinejoin;
-
-		this.flatShading = source.flatShading;
-
-		this.fog = source.fog;
-
-		return this;
-
-	}
-
-}
-
-const Cache = {
-
-	enabled: false,
-
-	files: {},
-
-	add: function ( key, file ) {
-
-		if ( this.enabled === false ) return;
-
-		// console.log( 'THREE.Cache', 'Adding key:', key );
-
-		this.files[ key ] = file;
-
-	},
-
-	get: function ( key ) {
-
-		if ( this.enabled === false ) return;
-
-		// console.log( 'THREE.Cache', 'Checking key:', key );
-
-		return this.files[ key ];
-
-	},
-
-	remove: function ( key ) {
-
-		delete this.files[ key ];
-
-	},
-
-	clear: function () {
-
-		this.files = {};
-
-	}
-
-};
-
-class LoadingManager {
-
-	constructor( onLoad, onProgress, onError ) {
-
-		const scope = this;
-
-		let isLoading = false;
-		let itemsLoaded = 0;
-		let itemsTotal = 0;
-		let urlModifier = undefined;
-		const handlers = [];
-
-		// Refer to #5689 for the reason why we don't set .onStart
-		// in the constructor
-
-		this.onStart = undefined;
-		this.onLoad = onLoad;
-		this.onProgress = onProgress;
-		this.onError = onError;
-
-		this.itemStart = function ( url ) {
-
-			itemsTotal ++;
-
-			if ( isLoading === false ) {
-
-				if ( scope.onStart !== undefined ) {
-
-					scope.onStart( url, itemsLoaded, itemsTotal );
-
-				}
-
-			}
-
-			isLoading = true;
-
-		};
-
-		this.itemEnd = function ( url ) {
-
-			itemsLoaded ++;
-
-			if ( scope.onProgress !== undefined ) {
-
-				scope.onProgress( url, itemsLoaded, itemsTotal );
-
-			}
-
-			if ( itemsLoaded === itemsTotal ) {
-
-				isLoading = false;
-
-				if ( scope.onLoad !== undefined ) {
-
-					scope.onLoad();
-
-				}
-
-			}
-
-		};
-
-		this.itemError = function ( url ) {
-
-			if ( scope.onError !== undefined ) {
-
-				scope.onError( url );
-
-			}
-
-		};
-
-		this.resolveURL = function ( url ) {
-
-			if ( urlModifier ) {
-
-				return urlModifier( url );
-
-			}
-
-			return url;
-
-		};
-
-		this.setURLModifier = function ( transform ) {
-
-			urlModifier = transform;
-
-			return this;
-
-		};
-
-		this.addHandler = function ( regex, loader ) {
-
-			handlers.push( regex, loader );
-
-			return this;
-
-		};
-
-		this.removeHandler = function ( regex ) {
-
-			const index = handlers.indexOf( regex );
-
-			if ( index !== - 1 ) {
-
-				handlers.splice( index, 2 );
-
-			}
-
-			return this;
-
-		};
-
-		this.getHandler = function ( file ) {
-
-			for ( let i = 0, l = handlers.length; i < l; i += 2 ) {
-
-				const regex = handlers[ i ];
-				const loader = handlers[ i + 1 ];
-
-				if ( regex.global ) regex.lastIndex = 0; // see #17920
-
-				if ( regex.test( file ) ) {
-
-					return loader;
-
-				}
-
-			}
-
-			return null;
-
-		};
-
-	}
-
-}
-
-const DefaultLoadingManager = /*@__PURE__*/ new LoadingManager();
-
-class Loader {
-
-	constructor( manager ) {
-
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-
-		this.crossOrigin = 'anonymous';
-		this.withCredentials = false;
-		this.path = '';
-		this.resourcePath = '';
-		this.requestHeader = {};
-
-	}
-
-	load( /* url, onLoad, onProgress, onError */ ) {}
-
-	loadAsync( url, onProgress ) {
-
-		const scope = this;
-
-		return new Promise( function ( resolve, reject ) {
-
-			scope.load( url, resolve, onProgress, reject );
-
-		} );
-
-	}
-
-	parse( /* data */ ) {}
-
-	setCrossOrigin( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-		return this;
-
-	}
-
-	setWithCredentials( value ) {
-
-		this.withCredentials = value;
-		return this;
-
-	}
-
-	setPath( path ) {
-
-		this.path = path;
-		return this;
-
-	}
-
-	setResourcePath( resourcePath ) {
-
-		this.resourcePath = resourcePath;
-		return this;
-
-	}
-
-	setRequestHeader( requestHeader ) {
-
-		this.requestHeader = requestHeader;
-		return this;
-
-	}
-
-}
-
-class ImageLoader extends Loader {
-
-	constructor( manager ) {
-
-		super( manager );
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		if ( this.path !== undefined ) url = this.path + url;
-
-		url = this.manager.resolveURL( url );
-
-		const scope = this;
-
-		const cached = Cache.get( url );
-
-		if ( cached !== undefined ) {
-
-			scope.manager.itemStart( url );
-
-			setTimeout( function () {
-
-				if ( onLoad ) onLoad( cached );
-
-				scope.manager.itemEnd( url );
-
-			}, 0 );
-
-			return cached;
-
-		}
-
-		const image = createElementNS( 'img' );
-
-		function onImageLoad() {
-
-			removeEventListeners();
-
-			Cache.add( url, this );
-
-			if ( onLoad ) onLoad( this );
-
-			scope.manager.itemEnd( url );
-
-		}
-
-		function onImageError( event ) {
-
-			removeEventListeners();
-
-			if ( onError ) onError( event );
-
-			scope.manager.itemError( url );
-			scope.manager.itemEnd( url );
-
-		}
-
-		function removeEventListeners() {
-
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
-
-		}
-
-		image.addEventListener( 'load', onImageLoad, false );
-		image.addEventListener( 'error', onImageError, false );
-
-		if ( url.slice( 0, 5 ) !== 'data:' ) {
-
-			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
-
-		}
-
-		scope.manager.itemStart( url );
-
-		image.src = url;
-
-		return image;
-
-	}
-
-}
-
-class TextureLoader extends Loader {
-
-	constructor( manager ) {
-
-		super( manager );
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		const texture = new Texture();
-
-		const loader = new ImageLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
-		loader.setPath( this.path );
-
-		loader.load( url, function ( image ) {
-
-			texture.image = image;
-			texture.needsUpdate = true;
-
-			if ( onLoad !== undefined ) {
-
-				onLoad( texture );
-
-			}
-
-		}, onProgress, onError );
-
-		return texture;
-
-	}
-
-}
-
 class Light extends Object3D {
 
 	constructor( color, intensity = 1 ) {
@@ -32255,72 +31777,35 @@ const canvas = document.getElementById("three-canvas");
     //1 The scene
     const scene = new Scene();
 
-    // const sphereGeometry = new SphereGeometry(0.5);
-
-    // const sunMaterial = new MeshLambertMaterial({color: 'orange'});
-    // const earthMaterial = new MeshLambertMaterial({color: 'blue'});    
-    // const moonMaterial = new MeshLambertMaterial({color: 'white'});
-
-    // const sun = new Mesh(sphereGeometry, sunMaterial);
-    // scene.add(sun);
-
-    // const earth = new Mesh(sphereGeometry, earthMaterial);
-    // earth.scale.set(0.2,0.2,0.2);
-    // earth.position.x += 5;
-    // sun.add(earth);
-
-    // const moon = new Mesh(sphereGeometry, moonMaterial);
-    // moon.scale.set(0.1,0.1,0.1);
-    // moon.position.x += 1;
-    // earth.add(moon);
-
-    //2 The Object
-    const boxGeometry = new BoxGeometry(0.5, 0.5, 0.5);
-
-    const loader = new TextureLoader();
-
-    const orangeMaterial = new MeshBasicMaterial({
-        color: 'orange',
-        map: loader.load("https://raw.githubusercontent.com/IFCjs/ifcjs-crash-course/main/static/logo.png")
-    });
-    const blueMaterial = new MeshLambertMaterial({
-        color: 'blue',
-        map: loader.load('./sample.jpg')
-    });
-    const greenMaterial = new MeshPhongMaterial({
-        color: 'green',
-        specular: 'white',
-        shininess: 100,
-        flatShading: true,
-    });
-
-    const orangeCube = new Mesh(boxGeometry, orangeMaterial);
-    scene.add(orangeCube);
-
-    const bigBlueCube = new Mesh(boxGeometry, blueMaterial);
-    bigBlueCube.position.x += 2;
-    bigBlueCube.scale.set(2,2,2);
-    scene.add(bigBlueCube);
-
-    const greenCube = new Mesh(boxGeometry, greenMaterial);
-    greenCube.position.x -= 2;
-    scene.add(greenCube);
 
     const grid = new GridHelper();
     grid.material.depthTest = false;
-    grid.renderOrder = 2;
+    grid.renderOrder = -1;
     scene.add(grid);
 
     const axes = new AxesHelper();
     axes.material.depthTest = false;
     axes.renderOrder = 3;
     scene.add(axes);
+
+    const boxGeometry = new BoxGeometry(0.5, 0.5, 0.5);
+
+    const greenMaterial = new MeshPhongMaterial({
+            color: 'green',
+            specular: 'white',
+            shininess: 100,
+            flatShading: true,
+        });   
+
+    const greenCube = new Mesh(boxGeometry, greenMaterial);
+    scene.add(greenCube);
+
     
     //3 The Camera
     const camera = new PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight);
-    camera.position.x = 6;
-    camera.position.y = 4;
-    camera.position.z = 5; // Z let's you move backwards and forwards. X is sideways, Y is upward and do
+    // camera.position.x = 6;
+    // camera.position.y = 4;
+    // camera.position.z = 5; // Z let's you move backwards and forwards. X is sideways, Y is upward and do
     camera.lookAt(axes.position);
     scene.add(camera);
     
@@ -32340,12 +31825,7 @@ const canvas = document.getElementById("three-canvas");
         camera.aspect = canvas.clientWidth / canvas.clientHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-    });
-
-    
-
-    // const controls = new OrbitControls(camera, canvas);
-    // controls.enableDamping = true;
+    });    
 
     const subsetOfTHREE = {
         MOUSE,
@@ -32368,19 +31848,53 @@ const canvas = document.getElementById("three-canvas");
     const cameraControls = new CameraControls(camera, canvas);
     cameraControls.dollyToCursor = true;
 
+    cameraControls.setLookAt(3, 4, 2, 0, 0, 0);
+
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
+
+    const previousSelection = {
+        geometry: null,
+        material: null
+    };
+
+    const highLightMat = new MeshPhongMaterial({color: 'red'});
+
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.clientX / canvas.clientHeight * 2 - 1;
+        mouse.y = - ( event.clientY / canvas.clientHeight ) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersection = raycaster.intersectObject(greenCube);
+        const hasCollided = intersection.length !== 0;
+
+        if(!hasCollided) {
+            if(previousSelection.mesh) {
+                previousSelection.mesh.material = previousSelection.material;
+                previousSelection.material = null;
+                previousSelection.geometry = null;
+            }
+            return;
+        }
+
+        const first = intersection[0];
+        const isPreviousSelection = previousSelection.mesh === first.object;
+
+        if(isPreviousSelection) return;
+
+        if(previousSelection.mesh) {
+            previousSelection.mesh.material = previousSelection.material;
+            previousSelection.material = null;
+            previousSelection.geometry = null;
+        }
+
+        previousSelection.geometry = greenCube;
+        previousSelection.material = greenCube.material;
+        greenCube.material = highLightMat;
+        console.log(intersection);
+    });
+
     function animate() {
-        orangeCube.rotation.x += 0.01;
-        orangeCube.rotation.z += 0.01;
-
-        bigBlueCube.rotation.x -= 0.02;
-        bigBlueCube.rotation.z -= 0.02;
-
-        greenCube.rotation.x += 0.005;
-        greenCube.rotation.z += 0.005;
-
-        // sun.rotation.y += 0.01;
-        // earth.rotation.y += 0.02;
-
         const delta = clock.getDelta();
 	    cameraControls.update( delta );
 
@@ -32389,20 +31903,3 @@ const canvas = document.getElementById("three-canvas");
     }
 
     animate();
-
-    // window.addEventListener("mousemove", (event) => {
-    //     const position = getMousePosition(event);
-    //     camera.position.x = Math.sin(position.x * Math.PI * 2) * 2;
-    //     camera.position.z = Math.cos(position.x * Math.PI * 2) * 2;
-    //     camera.position.y = position.y * 3;
-    //     camera.lookAt(orangeCube.position);
-    // });
-
-    // // The values will vary from -1 to +1
-    // function getMousePosition(event) {
-    //     const position = new Vector2();
-    //     const bounds = canvas.getBoundingClientRect();
-    //     position.x =((event.clientX - bounds.left) / (bounds.right - bounds.left)) * 2 - 1;
-    //     position.y = -((event.clientY - bounds.top) / (bounds.bottom - bounds.top)) * 2 + 1;
-    //     return position;
-    // }

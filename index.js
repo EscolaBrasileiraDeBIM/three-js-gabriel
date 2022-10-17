@@ -24,9 +24,17 @@ import {
     AmbientLight,
     SphereGeometry,
     AxesHelper,
-    GridHelper
+    GridHelper,
+    EdgesGeometry,
+    LineBasicMaterial,
+    LineSegments
 } from 'three';
+
 import CameraControls from 'camera-controls';
+import GUI from "three/examples/jsm/libs/lil-gui.module.min.js";
+import gsap from "gsap";
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+
     
 
     const canvas = document.getElementById("three-canvas");
@@ -34,72 +42,35 @@ import CameraControls from 'camera-controls';
     //1 The scene
     const scene = new Scene();
 
-    // const sphereGeometry = new SphereGeometry(0.5);
-
-    // const sunMaterial = new MeshLambertMaterial({color: 'orange'});
-    // const earthMaterial = new MeshLambertMaterial({color: 'blue'});    
-    // const moonMaterial = new MeshLambertMaterial({color: 'white'});
-
-    // const sun = new Mesh(sphereGeometry, sunMaterial);
-    // scene.add(sun);
-
-    // const earth = new Mesh(sphereGeometry, earthMaterial);
-    // earth.scale.set(0.2,0.2,0.2);
-    // earth.position.x += 5;
-    // sun.add(earth);
-
-    // const moon = new Mesh(sphereGeometry, moonMaterial);
-    // moon.scale.set(0.1,0.1,0.1);
-    // moon.position.x += 1;
-    // earth.add(moon);
-
-    //2 The Object
-    const boxGeometry = new BoxGeometry(0.5, 0.5, 0.5);
-
-    const loader = new TextureLoader();
-
-    const orangeMaterial = new MeshBasicMaterial({
-        color: 'orange',
-        map: loader.load("https://raw.githubusercontent.com/IFCjs/ifcjs-crash-course/main/static/logo.png")
-    });
-    const blueMaterial = new MeshLambertMaterial({
-        color: 'blue',
-        map: loader.load('./sample.jpg')
-    });
-    const greenMaterial = new MeshPhongMaterial({
-        color: 'green',
-        specular: 'white',
-        shininess: 100,
-        flatShading: true,
-    });
-
-    const orangeCube = new Mesh(boxGeometry, orangeMaterial);
-    scene.add(orangeCube);
-
-    const bigBlueCube = new Mesh(boxGeometry, blueMaterial);
-    bigBlueCube.position.x += 2;
-    bigBlueCube.scale.set(2,2,2);
-    scene.add(bigBlueCube);
-
-    const greenCube = new Mesh(boxGeometry, greenMaterial);
-    greenCube.position.x -= 2;
-    scene.add(greenCube);
 
     const grid = new GridHelper();
     grid.material.depthTest = false;
-    grid.renderOrder = 2;
+    grid.renderOrder = -1;
     scene.add(grid);
 
     const axes = new AxesHelper();
     axes.material.depthTest = false;
     axes.renderOrder = 3;
     scene.add(axes);
+
+    const boxGeometry = new BoxGeometry(0.5, 0.5, 0.5);
+
+    const greenMaterial = new MeshPhongMaterial({
+            color: 'green',
+            specular: 'white',
+            shininess: 100,
+            flatShading: true,
+        });   
+
+    const greenCube = new Mesh(boxGeometry, greenMaterial);
+    scene.add(greenCube);
+
     
     //3 The Camera
     const camera = new PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight);
-    camera.position.x = 6;
-    camera.position.y = 4;
-    camera.position.z = 5; // Z let's you move backwards and forwards. X is sideways, Y is upward and do
+    // camera.position.x = 6;
+    // camera.position.y = 4;
+    // camera.position.z = 5; // Z let's you move backwards and forwards. X is sideways, Y is upward and do
     camera.lookAt(axes.position);
     scene.add(camera);
     
@@ -119,12 +90,7 @@ import CameraControls from 'camera-controls';
         camera.aspect = canvas.clientWidth / canvas.clientHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-    });
-
-    
-
-    // const controls = new OrbitControls(camera, canvas);
-    // controls.enableDamping = true;
+    });    
 
     const subsetOfTHREE = {
         MOUSE,
@@ -147,19 +113,53 @@ import CameraControls from 'camera-controls';
     const cameraControls = new CameraControls(camera, canvas);
     cameraControls.dollyToCursor = true;
 
+    cameraControls.setLookAt(3, 4, 2, 0, 0, 0);
+
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
+
+    const previousSelection = {
+        geometry: null,
+        material: null
+    }
+
+    const highLightMat = new MeshPhongMaterial({color: 'red'});
+
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.clientX / canvas.clientHeight * 2 - 1;
+        mouse.y = - ( event.clientY / canvas.clientHeight ) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersection = raycaster.intersectObject(greenCube);
+        const hasCollided = intersection.length !== 0;
+
+        if(!hasCollided) {
+            if(previousSelection.mesh) {
+                previousSelection.mesh.material = previousSelection.material;
+                previousSelection.material = null;
+                previousSelection.geometry = null;
+            }
+            return;
+        }
+
+        const first = intersection[0];
+        const isPreviousSelection = previousSelection.mesh === first.object;
+
+        if(isPreviousSelection) return;
+
+        if(previousSelection.mesh) {
+            previousSelection.mesh.material = previousSelection.material;
+            previousSelection.material = null;
+            previousSelection.geometry = null;
+        }
+
+        previousSelection.geometry = greenCube;
+        previousSelection.material = greenCube.material;
+        greenCube.material = highLightMat;
+        console.log(intersection);
+    })
+
     function animate() {
-        orangeCube.rotation.x += 0.01;
-        orangeCube.rotation.z += 0.01;
-
-        bigBlueCube.rotation.x -= 0.02;
-        bigBlueCube.rotation.z -= 0.02;
-
-        greenCube.rotation.x += 0.005;
-        greenCube.rotation.z += 0.005;
-
-        // sun.rotation.y += 0.01;
-        // earth.rotation.y += 0.02;
-
         const delta = clock.getDelta();
 	    cameraControls.update( delta );
 
@@ -168,20 +168,3 @@ import CameraControls from 'camera-controls';
     }
 
     animate();
-
-    // window.addEventListener("mousemove", (event) => {
-    //     const position = getMousePosition(event);
-    //     camera.position.x = Math.sin(position.x * Math.PI * 2) * 2;
-    //     camera.position.z = Math.cos(position.x * Math.PI * 2) * 2;
-    //     camera.position.y = position.y * 3;
-    //     camera.lookAt(orangeCube.position);
-    // });
-
-    // // The values will vary from -1 to +1
-    // function getMousePosition(event) {
-    //     const position = new Vector2();
-    //     const bounds = canvas.getBoundingClientRect();
-    //     position.x =((event.clientX - bounds.left) / (bounds.right - bounds.left)) * 2 - 1;
-    //     position.y = -((event.clientY - bounds.top) / (bounds.bottom - bounds.top)) * 2 + 1;
-    //     return position;
-    // }
