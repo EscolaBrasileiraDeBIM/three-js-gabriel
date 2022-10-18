@@ -9,6 +9,31 @@
     visibility: collapse;
 }
 
+.label-container {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+}
+
+.delete-button {
+  padding: 6px;
+  border-radius: 1rem;
+  border: none;
+  margin-right: 8px;
+  height: 1.5rem;
+}
+
+.delete-button {
+  cursor: pointer;
+}
+
+.label {
+  background: rgba(255, 255, 255, 0.6);
+  padding: 8px;
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+}
+
 #three-canvas {
     position: absolute;
     width: 100%;

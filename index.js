@@ -34,6 +34,7 @@ import CameraControls from 'camera-controls';
 import GUI from "three/examples/jsm/libs/lil-gui.module.min.js";
 import gsap from "gsap";
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
     
 
@@ -41,8 +42,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 
     //1 The scene
     const scene = new Scene();
-
-
+    
     const grid = new GridHelper();
     grid.material.depthTest = false;
     grid.renderOrder = -1;
@@ -53,19 +53,30 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
     axes.renderOrder = 3;
     scene.add(axes);
 
-    const boxGeometry = new BoxGeometry(0.5, 0.5, 0.5);
+    const loader = new GLTFLoader();
 
-    const greenMaterial = new MeshPhongMaterial({
-            color: 'green',
-            specular: 'white',
-            shininess: 100,
-            flatShading: true,
-        });   
+    const loadingScreen = document.getElementById("loader-container");
+    const progressText = document.getElementById("progress-text");
+    let policeStation;
 
-    const greenCube = new Mesh(boxGeometry, greenMaterial);
-    scene.add(greenCube);
-
+    loader.load('./police_station.glb',
     
+    (gltf) => {
+        policeStation = gltf.scene
+        scene.add(policeStation);
+        loadingScreen.classList.add('hidden');
+    },
+    
+    (progress) => {
+        const progressPercent = progress.loaded / progress.total * 100;
+        const formatted = Math.trunc(progressPercent);
+        progressText.textContent = 'Loading: '+formatted+'%';
+    },
+
+    (error) => {
+        console.log(error);
+    });
+
     //3 The Camera
     const camera = new PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight);
     // camera.position.x = 6;
@@ -78,7 +89,14 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
     const renderer = new WebGLRenderer({canvas});
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-    renderer.setClearColor(0x3E3E3E, 1)
+    renderer.setClearColor(0x3E3E3E, 1);
+
+    const labelRender = new CSS2DRenderer();
+    labelRender.setSize(canvas.clientWidth, canvas.clientHeight);
+    labelRender.domElement.style.position = 'absolute';
+    labelRender.domElement.style.pointerEvents = 'none';
+    labelRender.domElement.style.top = '0';
+    document.body.appendChild(labelRender.domElement);
 
     const light = new DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 0.5);
@@ -90,7 +108,10 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
         camera.aspect = canvas.clientWidth / canvas.clientHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-    });    
+        labelRender.setSize(canvas.clientWidth, canvas.clientHeight);
+    });
+
+
 
     const subsetOfTHREE = {
         MOUSE,
@@ -113,50 +134,51 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
     const cameraControls = new CameraControls(camera, canvas);
     cameraControls.dollyToCursor = true;
 
-    cameraControls.setLookAt(3, 4, 2, 0, 0, 0);
+    cameraControls.setLookAt(18, 20, 18, 0, 10, 0);
 
     const raycaster = new Raycaster();
     const mouse = new Vector2();
 
-    const previousSelection = {
-        geometry: null,
-        material: null
-    }
 
-    const highLightMat = new MeshPhongMaterial({color: 'red'});
 
-    window.addEventListener('mousemove', (event) => {
-        mouse.x = event.clientX / canvas.clientHeight * 2 - 1;
-        mouse.y = - ( event.clientY / canvas.clientHeight ) * 2 + 1;
+    window.addEventListener('dblclick', () => {
+        mouse.x = event.clientX / canvas.clientWidth * 2 - 1;
+        mouse.y = - (event.clientY / canvas.clientHeight) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-        const intersection = raycaster.intersectObject(greenCube);
-        const hasCollided = intersection.length !== 0;
+        const intersects = raycaster.intersectObject(policeStation);
 
-        if(!hasCollided) {
-            if(previousSelection.mesh) {
-                previousSelection.mesh.material = previousSelection.material;
-                previousSelection.material = null;
-                previousSelection.geometry = null;
-            }
-            return;
+        if(!intersects.length) return;
+
+        const collisionLocation = intersects[0].point;
+
+        const message = window.prompt("Describe de issue:");
+
+        const container = document.createElement('div');
+        container.className = "label-container";
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = "X";
+        deleteButton.className = "delete-button hidden";
+        container.appendChild(deleteButton);
+
+        const label = document.createElement('p');
+        label.textContent = message;
+        label.classList.add('label');
+        container.appendChild(label);
+
+        const labelObject = new CSS2DObject(container);
+        labelObject.position.copy(collisionLocation);
+        scene.add(labelObject);
+
+        deleteButton.onclick = () => {
+            labelObject.removeFromParent();
+            labelObject.element = null;
+            container.remove();
         }
 
-        const first = intersection[0];
-        const isPreviousSelection = previousSelection.mesh === first.object;
-
-        if(isPreviousSelection) return;
-
-        if(previousSelection.mesh) {
-            previousSelection.mesh.material = previousSelection.material;
-            previousSelection.material = null;
-            previousSelection.geometry = null;
-        }
-
-        previousSelection.geometry = greenCube;
-        previousSelection.material = greenCube.material;
-        greenCube.material = highLightMat;
-        console.log(intersection);
+        container.onmouseenter = () => deleteButton.classList.remove('hidden');
+        container.onmouseleave = () => deleteButton.classList.add('hidden');
     })
 
     function animate() {
@@ -164,6 +186,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 	    cameraControls.update( delta );
 
         renderer.render(scene, camera);
+        labelRender.render(scene, camera);
         requestAnimationFrame(animate);
     }
 
